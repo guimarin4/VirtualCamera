@@ -44,14 +44,17 @@ class VirtualCamera:
         Establishes the connection to the camera via opencv
         Source: https://github.com/letmaik/pyvirtualcam/blob/master/samples/webcam_filter.py
         '''
-        cv_vid = cv2.VideoCapture(camera_id)
+        # Prefer DirectShow on Windows to avoid MSMF grab issues
+        try:
+            cv_vid = cv2.VideoCapture(camera_id, cv2.CAP_DSHOW)
+        except Exception:
+            cv_vid = cv2.VideoCapture(camera_id)
 
         if not cv_vid.isOpened():
-            raise RuntimeError('Video-Output cannot be opened.')
+            raise RuntimeError('Video output cannot be opened. Check camera permissions or if another app is using it.')
             
         cv_vid.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
         cv_vid.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
-        cv_vid.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
         cv_vid.set(cv2.CAP_PROP_FPS, self.fps)
 
         # Tatsächliche Einstellungen können sich von den oberhalb festgelegten dennoch unterscheiden!
@@ -65,8 +68,11 @@ class VirtualCamera:
             if not ret:
                 raise RuntimeError('Camera image cannot be loaded.')
             if bgr_to_rgb:
-                frame = frame[...,::-1]
-                
+                frame = frame[..., ::-1]
+
+            if frame.shape[1] != self.width or frame.shape[0] != self.height:
+                frame = cv2.resize(frame, (self.width, self.height), interpolation=cv2.INTER_LINEAR)
+
             if keyboard.is_pressed('q'):
                 # quit camera stream
                 cv_vid.release()

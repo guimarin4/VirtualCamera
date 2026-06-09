@@ -3,6 +3,6 @@ opencv-python>=4.8.0
 pyvirtualcam>=0.10.2
 Pillow>=9.4.0
 matplotlib>=3.7.1
-# numba removed: builds may fail on Windows / Python 3.13. Add back if you have compatible toolchain.
+numba>=0.56.4
 moviepy>=1.0.3
 keyboard>=0.13.5
