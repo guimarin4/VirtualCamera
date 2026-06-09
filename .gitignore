@@ -1,0 +1,11 @@
+#.gitignore for VirtualCamera
+.venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+env/
+.env
+.vscode/
+thumbs.db
+desktop.ini
